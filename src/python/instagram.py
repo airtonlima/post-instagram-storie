@@ -127,15 +127,17 @@ def post_story():
     global cl
     print('storie')
     print(LINK)
-    cl.photo_upload_to_story("./src/python/res/img_final.jpg", "", links=[StoryLink(webUri=LINK, x=0.29, y=0.84, width=0.3, height=0.05)])
+    cl.photo_upload_to_story("./src/python/res/img_final.jpg", "", links=[StoryLink(webUri=LINK, x=150, y=1200, width=600, height=120)])
 
 def main():
-    # result = login()
-    # if result:
-    save_image()
 
-    # if result: 
-    #     post_story()
+    is_logged = login()
+
+    if is_logged:
+        save_image()
+
+    if is_logged: 
+        post_story()
 
     print('finalizou')
 
