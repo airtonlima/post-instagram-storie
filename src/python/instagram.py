@@ -19,16 +19,16 @@ from instagrapi.types import StoryLink
 # TITULO = "Desconsiderar"
 # DESCRICAO = "Favor desconsiderar esse story, ele é um teste. Com uma descrição muito muito grande para ver como fica na imagem e letras pequenas para não quebrar."
 # LINK = 'https://google.com.br'
-print(sys.argv)
+
 IG_USERNAME = sys.argv[1]
 IG_PASSWORD = sys.argv[2]
-IMAGE_LINK = sys.argv[3]
-PRECO = sys.argv[4]
-DESCONTO = sys.argv[5]
-PRECO_CAPA = sys.argv[6]
-TITULO = sys.argv[7]
-DESCRICAO = sys.argv[8]
-LINK = sys.argv[9]
+TITULO      = sys.argv[3]
+IMAGE_LINK  = sys.argv[4]
+LINK        = sys.argv[5]
+PRECO       = sys.argv[6]
+# PRECO_CAPA = sys.argv[7]
+# DESCONTO = sys.argv[8]
+# DESCRICAO = sys.argv[9]
 IG_CREDENTIAL_PATH = './src/python/credential.json'
 
 cl = Client()
@@ -49,7 +49,7 @@ def login():
         return False
 
 def save_image():
-    
+    print("Starting save_image...")
     try:
         try:
             response = requests.get(IMAGE_LINK)
@@ -57,35 +57,38 @@ def save_image():
             print('Erro: Erro ao requerir imagem')
 
         bg = Image.open('./src/python/res/story.jpg')
-        productImage = Image.open(BytesIO(response.content))
-        productImage = productImage.resize((600, 600))
-        linkImage = Image.open('./src/python/res/link.jpg')
-        linkImage = linkImage.resize((600, 120))
+        bg = bg.resize((720, 1280))
+
+        product_image = Image.open(BytesIO(response.content))
+        product_image = product_image.resize((535, 535))
+        product_link  = Image.open('./src/python/res/link.jpg')
+        product_link  = product_link.resize((450, 100))
 
         imgcp = bg.copy()
-        imgcp.paste(productImage, ((150), (250)))
-        imgcp.paste(linkImage, ((150), (1200)))
+        imgcp.paste(product_image, ((90), (190)))
+        imgcp.paste(product_link, ((135), (960)))
 
-        draw = ImageDraw.Draw(imgcp)
-        pos_y = 930
-        pos_x = 120
+        draw  = ImageDraw.Draw(imgcp)
+        pos_y = 730
+        pos_x = 95
         position = (pos_x, pos_y)
 
         # Titulo
-        font = ImageFont.truetype('./src/python/res/SEGUISB.TTF', 30)
+        font = ImageFont.truetype('./src/python/res/SEGUISB.TTF', 24)
         width, height = font.getsize(TITULO)
         lines = textwrap.wrap(TITULO, width=45)
+        
         for line in lines:
             draw.text(position, line, font=font, fill="#000", stroke_width=0)
             pos_y += height
             position = (pos_x, pos_y)
 
         # Preço
-        position = (120, 1080)
-        font = ImageFont.truetype('./src/python/res/SEGUISB.TTF', 60)
-        draw.text(position, PRECO, font=font, fill="#000", stroke_width=1, stroke_fill="#000")
+        position = (95, 865)
+        font = ImageFont.truetype('./src/python/res/SEGUISB.TTF', 45)
+        draw.text(position, PRECO, font=font, fill="#000", stroke_width=0, stroke_fill="#000")
         
-        #Preço capa
+        # Preço capa
         # pos_y = 150
         # pos_x = 460
         # position = (pos_x, pos_y)
@@ -118,18 +121,22 @@ def save_image():
         imgcp.save('./src/python/res/img_final.jpg')
 
         return True
+    
     except Exception as ex:
         print('Erro: Erro ao montar a imagem')
         print(ex)
         return False
 
 def post_story():
+    print("Starting post_story...")
     global cl
-    print('storie')
-    print(LINK)
-    cl.photo_upload_to_story("./src/python/res/img_final.jpg", "", links=[StoryLink(webUri=LINK, x=150, y=1200, width=600, height=120)])
+    cl.photo_upload_to_story("./src/python/res/img_final.jpg", "", 
+        links=[StoryLink(webUri=LINK, x=0.50, y=0.80, width=0.3, height=0.05)],
+        extra_data={"share_to_facebook": 0}
+    )
 
 def main():
+    print("Starting main...")
 
     is_logged = login()
 
@@ -139,7 +146,7 @@ def main():
     if is_logged: 
         post_story()
 
-    print('finalizou')
+    print('Finish')
 
 if __name__ == "__main__":
     main()
